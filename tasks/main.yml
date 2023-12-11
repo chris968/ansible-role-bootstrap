@@ -2,7 +2,8 @@
 # tasks file for bootstrap
 
 - name: Import assert.yml
-  ansible.builtin.import_tasks: assert.yml
+  ansible.builtin.import_tasks:
+    file: assert.yml
   run_once: yes
   delegate_to: localhost
 
@@ -37,6 +38,8 @@
 
     - name: Install bootstrap packages (raw)
       ansible.builtin.raw: "{{ bootstrap_install.raw }}"
+      args:
+        executable: /bin/sh
       register: bootstrap_install_packages
       changed_when:
         - (bootstrap_install.stdout_regex in bootstrap_install_packages.stdout and
@@ -52,5 +55,6 @@
   ansible.builtin.package:
     name: "{{ item }}"
     state: present
+    update_cache: true
   loop: "{{ bootstrap_facts_packages.split() }}"
   become: "{{ bootstrap_become }}"
